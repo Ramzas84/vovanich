@@ -30,7 +30,7 @@ Coord moove (Coord st, const Coord moove){
     return fn;
 }
 
-void possibleMoove (int** desk, int size, Coord st, int step, queue<Coord> q){
+void possibleMoove (int** desk, int size, Coord st, int step, queue<Coord>& q){
     vector<Coord> mv {{1, 2}, {1, -2}, {-1, 2}, {-1, -2},
                     {2, 1}, {-2, 1}, {2, -1}, {-2, -1}};
     for (Coord vec : mv){
@@ -58,11 +58,14 @@ void lookFoFin (int** desk, int size, Coord st, Coord fin){
         }
         ++step;
         q = q1;
+        while (!q1.empty()){
+            q1.pop();
+        }
     }
 }
 
 int main (){
-    int size = 3;
+    int size = 5;
     int** desk;
     desk = new int*[size];
     for (int i = 0; i < size; ++i){
