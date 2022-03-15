@@ -1,122 +1,83 @@
 #include <iostream>
+#include <vector>
+#include <queue>
 
 using namespace std;
 
-void prnt (int desk[30][30]){
-    for (int i = 0; i < 30; ++i){
-        for (int j = 0; j < 30; ++j){
-            if (desk[i][j] == 0) {printf("|_");}
-            else if (desk[i][j] == 100){printf("FN");}
-            else {printf("%2d", desk[i][j]);}
+void prnt (int** desk, int size){
+    for (int i = 0; i < size; ++i){
+        for (int j = 0; j < size; ++j){
+            if (desk[i][j] == 0){
+                printf ("|__");
+            }
+            else {
+                printf("|%2d", desk[i][j]);
+            }
         }
-        printf("|\n");
+        printf ("|\n");
     }
 }
 
-struct Coords {
-    int i;
-    int j;
-    Coords (int a, int b) : i(a), j(b) {}
-    friend bool operator== (Coords a, Coords b);
+struct Coord {
+    int x;
+    int y;
+Coord() : x(0), y(0) {}
+Coord(int a, int b) : x(b), y(a) {}
 };
-bool operator== (Coords a, Coords b){
-    if ((a.i == b.i) && (a.j == b.j)){return true;}
-    return false;
-}
-Coords mov (Coords now, int i, int j){
-    Coords a (now.i + i, now.j + j);
-    return a;
+
+Coord moove (Coord st, const Coord moove){
+    Coord fn(st.x + moove.x, st.y + moove.y);
+    return fn;
 }
 
-Coords posMoov (Coords now, Coords fin){
-    if (mov(now, 1, 2) == fin) return fin;
-    if (mov(now, 1, -2) == fin) return fin;
-    if (mov(now, -1, 2) == fin) return fin;
-    if (mov(now, -1, -2) == fin) return fin;
-    if (mov(now, 2, 1) == fin) return fin;
-    if (mov(now, 2, -1) == fin) return fin;
-    if (mov(now, -2, 1) == fin) return fin;
-    if (mov(now, -2, -1) == fin) return fin;
+void possibleMoove (int** desk, int size, Coord st, int step, queue<Coord> q){
+    vector<Coord> mv {{1, 2}, {1, -2}, {-1, 2}, {-1, -2},
+                    {2, 1}, {-2, 1}, {2, -1}, {-2, -1}};
+    for (Coord vec : mv){
+        Coord cur = moove(st, vec);
+        if (((cur.x >= 0) && (cur.y >=0)) && ((cur.x < size) && (cur.y < size)) && desk[cur.y][cur.x] == 0){
+            desk[cur.y][cur.x] = step;
+            q.push(cur);
+        }
+    }
 }
 
-
-
-Coords nextStep (int iNow, int jNow, int iFin, int jFin){
-    int iVec  = 1;
-    if ((iFin - iNow) < 0) {iVec = -1;}
-    int jVec  = 1;
-    if ((jFin - jNow) < 0) {jVec = -1;}
-    int iSum = iFin - iNow;
-    if (iSum < 0) {iSum *= -1;}
-    int jSum = jFin - jNow;
-    if (jSum < 0) {jSum *= -1;}
-    if (iSum < jSum){
-        return Coords(iNow + iVec, jNow + jVec * 2);
+void lookFoFin (int** desk, int size, Coord st, Coord fin){
+    int step = 1;
+    queue<Coord> q;
+    q.push(st);
+    queue<Coord> q1;
+    while (desk[fin.x][fin.y] == 0){
+        if (q.empty()){
+            printf ("Impossibl\n");
+            break;
+        }
+        while (!q.empty()){
+            possibleMoove (desk, size, q.front(), step, q1);
+            q.pop();
+        }
+        ++step;
+        q = q1;
     }
-    return Coords(iNow + iVec * 2, jNow + jVec);
-}
-
-void founder (Coords now, Coords fin){
-    int desk[30][30] = {0};
-    int a = 1;
-    desk[now.i][now.j] = a++;
-    desk[fin.i][fin.j] = 100;
-    while((((fin.i - now.i) < -2) || ((fin.i - now.i) > 2)) ||
-            (((fin.j - now.j) < -2) || ((fin.j - now.j) > 2))){
-        now = nextStep (now.i, now.j, fin.i, fin.j);
-        desk[now.i][now.j] = a++;
-    }
-    if (posMoov(now,fin) == fin){
-        desk[fin.i][fin.j] = a;
-        now = fin;
-    }
-    else {
-        if (posMoov(Coords(now.i + 1, now.j + 2),fin) == fin){
-            desk[now.i + 1][now.j + 2] = a++;
-            desk[fin.i][fin.j] = a;
-        }
-        if (posMoov(Coords(now.i + 1, now.j - 2),fin) == fin){
-            desk[now.i + 1][now.j - 2] = a++;
-            desk[fin.i][fin.j] = a;
-        }
-        if (posMoov(Coords(now.i - 1, now.j + 2),fin) == fin){
-            desk[now.i - 1][now.j + 2] = a++;
-            desk[fin.i][fin.j] = a;
-        }
-        if (posMoov(Coords(now.i - 1, now.j - 2),fin) == fin){
-            desk[now.i - 1][now.j - 2] = a++;
-            desk[fin.i][fin.j] = a;
-        }
-        if (posMoov(Coords(now.i + 2, now.j + 1),fin) == fin){
-            desk[now.i + 2][now.j + 1] = a++;
-            desk[fin.i][fin.j] = a;
-        }
-        if (posMoov(Coords(now.i + 2, now.j - 1),fin) == fin){
-            desk[now.i + 2][now.j - 1] = a++;
-            desk[fin.i][fin.j] = a;
-        }
-        if (posMoov(Coords(now.i - 2, now.j + 1),fin) == fin){
-            desk[now.i - 2][now.j + 1] = a++;
-            desk[fin.i][fin.j] = a;
-        }
-        if (posMoov(Coords(now.i - 2, now.j - 1),fin) == fin){
-            desk[now.i - 2][now.j - 1] = a++;
-            desk[fin.i][fin.j] = a;
-        }
-
-    }
-
-    prnt(desk);
-
-    printf("CoordNow = %d:%d", now.i, now.j);
-
 }
 
 int main (){
-
-    Coords n(25,25);
-    Coords f(6,4);
-    founder (n, f);
-
+    int size = 3;
+    int** desk;
+    desk = new int*[size];
+    for (int i = 0; i < size; ++i){
+        desk[i] = new int[size];
+    }
+    Coord start (1, 0);
+    Coord fin (1, 1);
+    desk[start.x][start.y] = -1;
+    
+    //queue<Coord>q;
+    
+    //possibleMoove(desk, size, start, 1, q);
+    lookFoFin(desk, size, start, fin);
+    
+    prnt (desk, size);
+    
     return 0;
 }
