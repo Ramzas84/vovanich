@@ -46,9 +46,11 @@ void lookFoFin (int** desk, int size, Coord st, Coord fin){
     int step = 1;
     queue<Coord> q;
     q.push(st);
+    bool fl = true;
     while (desk[fin.x][fin.y] == 0){
         if (q.empty()){
             printf ("Impossibl\n");
+            fl = false;
             break;
         }
         queue<Coord> q1;
@@ -59,10 +61,11 @@ void lookFoFin (int** desk, int size, Coord st, Coord fin){
         ++step;
         q = q1;
     }
+    if (fl) {prnt (desk, size);}
 }
 
 int main (){
-    int size = 3;
+    int size = 4;
     int** desk;
     desk = new int*[size];
     for (int i = 0; i < size; ++i){
@@ -72,12 +75,7 @@ int main (){
     Coord fin (1, 1);
     desk[start.x][start.y] = -1;
     
-    //queue<Coord>q;
-    
-    //possibleMoove(desk, size, start, 1, q);
     lookFoFin(desk, size, start, fin);
-    
-    prnt (desk, size);
     
     return 0;
 }
