@@ -16,11 +16,14 @@ typedef vector<vector<Coord>> Way;
 int dx[8] = {1, 1, -1, -1, 2, 2, -2, -2};
 int dy[8] = {2, -2, 2, -2, 1, -1, 1, -1};
 
+bool chek (int z, int size){
+    return (z >= 0) && (z < size);
+}
 
 int main (){
-    int size = 10;
-    Coord st(9, 8);
-    Coord fin(0, 1);
+    int size = 5;
+    Coord st(4, 4);
+    Coord fin(4, 3);
     Desk desk;
     Visited v;
     Way w;
@@ -38,13 +41,13 @@ int main (){
         Coord cur = q.front();
         q.pop();
         for (int i = 0; i < 8; ++i){
-            if (((cur.x + dx[i]) < 0) || ((cur.y + dy[i]) < 0)) continue;
-            if (((cur.x + dx[i]) >= size) || ((cur.y + dy[i]) >= size)) continue;
+            Coord next(cur.x + dx[i], cur.y + dy[i]);
+            if (!chek (next.x, size) || !chek(next.y, size)) continue;
             if (v[cur.x + dx[i]][cur.y + dy[i]]) continue;
-            desk[cur.x + dx[i]][cur.y + dy[i]] = desk[cur.x][cur.y] + 1;
-            v[cur.x + dx[i]][cur.y + dy[i]] = true;
-            q.push({cur.x + dx[i], cur.y + dy[i]});
-            w[cur.x + dx[i]][cur.y + dy[i]] = cur;
+            desk[next.x][next.y] = desk[cur.x][cur.y] + 1;
+            v[next.x][next.y] = true;
+            q.push(next);
+            w[next.x][next.y] = cur;
         }
     }
     
@@ -64,10 +67,9 @@ int main (){
         for (vector<int> i : desk){
             for (int j : i){
                printf("|%2d", j);
+            }
+            cout <<'|'<<endl;
         }
-        cout <<'|'<<endl;
-    }
-    
     }
     else {
         cout << "impossible";
