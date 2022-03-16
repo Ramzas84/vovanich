@@ -4,78 +4,75 @@
 
 using namespace std;
 
-void prnt (int** desk, int size){
-    for (int i = 0; i < size; ++i){
-        for (int j = 0; j < size; ++j){
-            if (desk[i][j] == 0){
-                printf ("|__");
-            }
-            else {
-                printf("|%2d", desk[i][j]);
-            }
-        }
-        printf ("|\n");
-    }
-}
-
-struct Coord {
-    int x;
-    int y;
-Coord() : x(0), y(0) {}
-Coord(int a, int b) : x(b), y(a) {}
+struct Coord{
+  int x, y;
+  Coord (int a, int b) : x(a), y(b) {};
 };
 
-Coord moove (Coord st, const Coord moove){
-    Coord fn(st.x + moove.x, st.y + moove.y);
-    return fn;
-}
+typedef vector<vector<int>> Desk;
+typedef vector<vector<bool>> Visited;
+typedef vector<vector<Coord>> Way;
 
-void possibleMoove (int** desk, int size, Coord st, int step, queue<Coord>& q){
-    vector<Coord> mv {{1, 2}, {1, -2}, {-1, 2}, {-1, -2},
-                    {2, 1}, {-2, 1}, {2, -1}, {-2, -1}};
-    for (Coord vec : mv){
-        Coord cur = moove(st, vec);
-        if (((cur.x >= 0) && (cur.y >=0)) && ((cur.x < size) && (cur.y < size)) && desk[cur.y][cur.x] == 0){
-            desk[cur.y][cur.x] = step;
-            q.push(cur);
-        }
-    }
-}
+int dx[8] = {1, 1, -1, -1, 2, 2, -2, -2};
+int dy[8] = {2, -2, 2, -2, 1, -1, 1, -1};
 
-void lookFoFin (int** desk, int size, Coord st, Coord fin){
-    int step = 1;
-    queue<Coord> q;
-    q.push(st);
-    bool fl = true;
-    while (desk[fin.x][fin.y] == 0){
-        if (q.empty()){
-            printf ("Impossibl\n");
-            fl = false;
-            break;
-        }
-        queue<Coord> q1;
-        while (!q.empty()){
-            possibleMoove (desk, size, q.front(), step, q1);
-            q.pop();
-        }
-        ++step;
-        q = q1;
-    }
-    if (fl) {prnt (desk, size);}
-}
 
 int main (){
-    int size = 4;
-    int** desk;
-    desk = new int*[size];
+    int size = 10;
+    Coord st(9, 8);
+    Coord fin(0, 1);
+    Desk desk;
+    Visited v;
+    Way w;
     for (int i = 0; i < size; ++i){
-        desk[i] = new int[size];
+        desk.push_back(vector<int>(size, 0));
+        v.push_back(vector<bool>(size, false));
+        w.push_back(vector<Coord>(size, {0, 0}));
     }
-    Coord start (1, 0);
-    Coord fin (1, 1);
-    desk[start.x][start.y] = -1;
     
-    lookFoFin(desk, size, start, fin);
+    queue<Coord> q;
+    q.push(st);
+    v[st.x][st.y] = true;
+    while (!q.empty()){
+        if (v[fin.x][fin.y]) break;
+        Coord cur = q.front();
+        q.pop();
+        for (int i = 0; i < 8; ++i){
+            if (((cur.x + dx[i]) < 0) || ((cur.y + dy[i]) < 0)) continue;
+            if (((cur.x + dx[i]) >= size) || ((cur.y + dy[i]) >= size)) continue;
+            if (v[cur.x + dx[i]][cur.y + dy[i]]) continue;
+            desk[cur.x + dx[i]][cur.y + dy[i]] = desk[cur.x][cur.y] + 1;
+            v[cur.x + dx[i]][cur.y + dy[i]] = true;
+            q.push({cur.x + dx[i], cur.y + dy[i]});
+            w[cur.x + dx[i]][cur.y + dy[i]] = cur;
+        }
+    }
+    
+    if (v[fin.x][fin.y]) {
+        cout << desk[fin.x][fin.y]<< endl;
+       
+        vector<Coord> temp;
+        Coord now = fin;
+        while ((now.x != st.x) || (now.y != st.y)){
+            temp.push_back(now);
+            now = w[now.x][now.y];
+        }
+        for (int i = temp.size() - 1; i >= 0; --i){
+            cout <<temp[i].x <<", " <<temp[i].y <<endl;
+        }
+        
+        for (vector<int> i : desk){
+            for (int j : i){
+               printf("|%2d", j);
+        }
+        cout <<'|'<<endl;
+    }
+    
+    }
+    else {
+        cout << "impossible";
+    }
+    
     
     return 0;
 }
