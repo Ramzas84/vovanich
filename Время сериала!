@@ -111,4 +111,5 @@ int main (){
     //printInt (x, y, z, longer);
     //printf("%d", longer[tmp.x][tmp.y][tmp.z]);
     return 0;
+    
 }
