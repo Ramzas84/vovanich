@@ -1,0 +1,33 @@
+#include <iostream>
+
+using namespace std;
+
+int main(){
+    int elements;
+    cin >> elements;
+    bool res[elements] = {false};
+    for (int i = 0; i < elements; ++i){
+        int len, num;
+        cin >> len >> num;
+        int arr[len];
+        int chet = 0;
+        int notChet = 0;
+        int sum = 0;
+        for (int j = 0; j < len; ++j){
+            cin >> arr[j];
+            if ((arr[j] % 2) == 1) ++notChet;
+            else ++chet;
+        }
+        if (!notChet) continue;
+        else if (num == len){
+            if ((notChet % 2) == 1) res[i] = true;
+        }
+        else if (chet) res[i] = true;
+        else if ((num % 2) == 1) res[i] = true;
+    }
+    for (int i = 0; i < elements; ++i){
+        if (res[i]) printf("Yes\n");
+        else printf("No\n");
+    }
+    return 0;
+}
